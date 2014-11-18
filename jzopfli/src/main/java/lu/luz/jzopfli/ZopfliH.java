@@ -16,65 +16,65 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+//#ifndef ZOPFLI_ZOPFLI_H_
+//#define ZOPFLI_ZOPFLI_H_
 
-#ifndef ZOPFLI_ZOPFLI_H_
-#define ZOPFLI_ZOPFLI_H_
+//#include <stddef.h>
+//#include <stdlib.h> /* for size_t */
+public abstract class ZopfliH{
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
-#include <stddef.h>
-#include <stdlib.h> /* for size_t */
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/*
+/**
 Options used throughout the program.
 */
-typedef struct ZopfliOptions {
-  /* Whether to print output */
-  int verbose;
+public static class ZopfliOptions {
+  /** Whether to print output */
+  public boolean verbose = false;
 
-  /* Whether to print more detailed output */
-  int verbose_more;
+  /** Whether to print more detailed output */
+  public boolean verbose_more = false;
 
-  /*
+  /**
   Maximum amount of times to rerun forward and backward pass to optimize LZ77
   compression cost. Good values: 10, 15 for small files, 5 for files over
   several MB in size or it will be too slow.
   */
-  int numiterations;
+  public int numiterations = 15;
 
-  /*
+  /**
   If true, splits the data in multiple deflate blocks with optimal choice
   for the block boundaries. Block splitting gives better compression. Default:
   true (1).
   */
-  int blocksplitting;
+  public boolean blocksplitting = true;
 
-  /*
+  /**
   If true, chooses the optimal block split points only after doing the iterative
   LZ77 compression. If false, chooses the block split points first, then does
   iterative LZ77 on each individual block. Depending on the file, either first
   or last gives the best compression. Default: false (0).
   */
-  int blocksplittinglast;
+  public boolean blocksplittinglast = false;
 
-  /*
+  /**
   Maximum amount of blocks to split into (0 for unlimited, but this can give
   extreme results that hurt compression on some files). Default value: 15.
   */
-  int blocksplittingmax;
-} ZopfliOptions;
+  public int blocksplittingmax = 15;
+}// ZopfliOptions;
 
 /* Initializes options with default values. */
-void ZopfliInitOptions(ZopfliOptions* options);
+//void ZopfliInitOptions(ZopfliOptions options);
 
-/* Output format */
-typedef enum {
+/** Output format */
+public enum ZopfliFormat {
   ZOPFLI_FORMAT_GZIP,
   ZOPFLI_FORMAT_ZLIB,
   ZOPFLI_FORMAT_DEFLATE
-} ZopfliFormat;
+} //ZopfliFormat;
 
 /*
 Compresses according to the given output format and appends the result to the
@@ -86,12 +86,13 @@ out: pointer to the dynamic output array to which the result is appended. Must
   be freed after use
 outsize: pointer to the dynamic output array size
 */
-void ZopfliCompress(const ZopfliOptions* options, ZopfliFormat output_type,
-                    const unsigned char* in, size_t insize,
-                    unsigned char** out, size_t* outsize);
+//void ZopfliCompress(ZopfliOptions options, ZopfliFormat output_type,
+//                    byte[] in, int insize,
+//                    OutputStream out, int[] outsize);
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif
+//#ifdef __cplusplus
+//}  // extern "C"
+//#endif
 
-#endif  /* ZOPFLI_ZOPFLI_H_ */
+//#endif  /* ZOPFLI_ZOPFLI_H_ */
+}

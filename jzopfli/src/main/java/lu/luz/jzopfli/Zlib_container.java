@@ -16,27 +16,27 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+import lu.luz.jzopfli.ZopfliH.*;//#include "zlib_container.h"
+import static lu.luz.jzopfli.Util.*;//#include "util.h"
 
-#include "zlib_container.h"
-#include "util.h"
+//#include <stdio.h>
 
-#include <stdio.h>
+import static lu.luz.jzopfli.Deflate.*;//#include "deflate.h"
+class Zlib_container extends Zlib_containerH{
 
-#include "deflate.h"
-
-
-/* Calculates the adler32 checksum of the data */
-static unsigned adler32(const unsigned char* data, size_t size)
+/** Calculates the adler32 checksum of the data */
+private static int adler32(byte[] data, int size)
 {
-  static const unsigned sums_overflow = 5550;
-  unsigned s1 = 1;
-  unsigned s2 = 1 >> 16;
-
+  final int sums_overflow = 5550;
+  int s1 = 1;
+  int s2 = 1 >> 16;
+  int i=0;
   while (size > 0) {
-    size_t amount = size > sums_overflow ? sums_overflow : size;
+	  int amount = size > sums_overflow ? sums_overflow : size;
     size -= amount;
     while (amount > 0) {
-      s1 += (*data++);
+      s1 += data[i++]&0xff;
       s2 += s1;
       amount--;
     }
@@ -47,33 +47,34 @@ static unsigned adler32(const unsigned char* data, size_t size)
   return (s2 << 16) | s1;
 }
 
-void ZopfliZlibCompress(const ZopfliOptions* options,
-                        const unsigned char* in, size_t insize,
-                        unsigned char** out, size_t* outsize) {
-  unsigned char bitpointer = 0;
-  unsigned checksum = adler32(in, (unsigned)insize);
-  unsigned cmf = 120;  /* CM 8, CINFO 7. See zlib spec.*/
-  unsigned flevel = 0;
-  unsigned fdict = 0;
-  unsigned cmfflg = 256 * cmf + fdict * 32 + flevel * 64;
-  unsigned fcheck = 31 - cmfflg % 31;
+public static void ZopfliZlibCompress(ZopfliOptions options,
+                        byte[] in, int insize,
+                        byte[][] out, int[] outsize) {
+  byte[] bitpointer = {0};
+  int checksum = adler32(in, insize);
+  int cmf = 120;  /* CM 8, CINFO 7. See zlib spec.*/
+  int flevel = 0;
+  int fdict = 0;
+  int cmfflg = 256 * cmf + fdict * 32 + flevel * 64;
+  int fcheck = 31 - cmfflg % 31;
   cmfflg += fcheck;
 
   ZOPFLI_APPEND_DATA(cmfflg / 256, out, outsize);
   ZOPFLI_APPEND_DATA(cmfflg % 256, out, outsize);
 
-  ZopfliDeflate(options, 2 /* dynamic block */, 1 /* final */,
-                in, insize, &bitpointer, out, outsize);
+  ZopfliDeflate(options, 2 /* dynamic block */, true /* final */,
+                in, insize, bitpointer, out, outsize);
 
   ZOPFLI_APPEND_DATA((checksum >> 24) % 256, out, outsize);
   ZOPFLI_APPEND_DATA((checksum >> 16) % 256, out, outsize);
   ZOPFLI_APPEND_DATA((checksum >> 8) % 256, out, outsize);
   ZOPFLI_APPEND_DATA(checksum % 256, out, outsize);
 
-  if (options->verbose) {
-    fprintf(stderr,
+  if (options.verbose) {
+    System.err.printf(
             "Original Size: %d, Zlib: %d, Compression: %f%% Removed\n",
-            (int)insize, (int)*outsize,
-            100.0 * (double)(insize - *outsize) / (double)insize);
+            insize, outsize[0],
+            100.0 * (double)(insize - outsize[0]) / (double)insize);
   }
+}
 }

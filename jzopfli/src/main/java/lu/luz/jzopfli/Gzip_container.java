@@ -16,28 +16,28 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+import lu.luz.jzopfli.ZopfliH.*;//#include "gzip_container.h"
+import static lu.luz.jzopfli.Util.*;//#include "util.h"
 
-#include "gzip_container.h"
-#include "util.h"
+//#include <stdio.h>
 
-#include <stdio.h>
+import static lu.luz.jzopfli.Deflate.*;//#include "deflate.h"
+class Gzip_container extends Gzip_containerH{
+/** Table of CRCs of all 8-bit messages. */
+private static long[] crc_table=new long[256];
 
-#include "deflate.h"
+/** Flag: has the table been computed? Initially false. */
+private static boolean crc_table_computed = false;
 
-/* Table of CRCs of all 8-bit messages. */
-static unsigned long crc_table[256];
-
-/* Flag: has the table been computed? Initially false. */
-static int crc_table_computed = 0;
-
-/* Makes the table for a fast CRC. */
-static void MakeCRCTable() {
-  unsigned long c;
+/** Makes the table for a fast CRC. */
+private static void MakeCRCTable() {
+  long c;
   int n, k;
   for (n = 0; n < 256; n++) {
-    c = (unsigned long) n;
+    c = (long) n;
     for (k = 0; k < 8; k++) {
-      if (c & 1) {
+      if ((c & 1) != 0) {
         c = 0xedb88320L ^ (c >> 1);
       } else {
         c = c >> 1;
@@ -45,40 +45,40 @@ static void MakeCRCTable() {
     }
     crc_table[n] = c;
   }
-  crc_table_computed = 1;
+  crc_table_computed = true;
 }
 
 
-/*
+/**
 Updates a running crc with the bytes buf[0..len-1] and returns
 the updated crc. The crc should be initialized to zero.
 */
-static unsigned long UpdateCRC(unsigned long crc,
-                               const unsigned char *buf, size_t len) {
-  unsigned long c = crc ^ 0xffffffffL;
-  unsigned n;
+private static long UpdateCRC(long crc,
+                               byte[] buf, int len) {
+  long c = crc ^ 0xffffffffL;
+  int n;
 
   if (!crc_table_computed)
     MakeCRCTable();
   for (n = 0; n < len; n++) {
-    c = crc_table[(c ^ buf[n]) & 0xff] ^ (c >> 8);
+    c = crc_table[(int)(c ^ buf[n]) & 0xff] ^ (c >> 8);
   }
   return c ^ 0xffffffffL;
 }
 
-/* Returns the CRC of the bytes buf[0..len-1]. */
-static unsigned long CRC(const unsigned char* buf, int len) {
+/** Returns the CRC of the bytes buf[0..len-1]. */
+private static long CRC(byte[] buf, int len) {
   return UpdateCRC(0L, buf, len);
 }
 
-/*
+/**
 Compresses the data according to the gzip specification.
 */
-void ZopfliGzipCompress(const ZopfliOptions* options,
-                        const unsigned char* in, size_t insize,
-                        unsigned char** out, size_t* outsize) {
-  unsigned long crcvalue = CRC(in, insize);
-  unsigned char bp = 0;
+public static void ZopfliGzipCompress(ZopfliOptions options,
+                        byte[] in, int insize,
+                        byte[][] out, int[] outsize) {
+  long crcvalue = CRC(in, insize);
+  byte[] bp = {0};
 
   ZOPFLI_APPEND_DATA(31, out, outsize);  /* ID1 */
   ZOPFLI_APPEND_DATA(139, out, outsize);  /* ID2 */
@@ -93,14 +93,14 @@ void ZopfliGzipCompress(const ZopfliOptions* options,
   ZOPFLI_APPEND_DATA(2, out, outsize);  /* XFL, 2 indicates best compression. */
   ZOPFLI_APPEND_DATA(3, out, outsize);  /* OS follows Unix conventions. */
 
-  ZopfliDeflate(options, 2 /* Dynamic block */, 1,
-                in, insize, &bp, out, outsize);
+  ZopfliDeflate(options, 2 /* Dynamic block */, true,
+                in, insize, bp, out, outsize);
 
   /* CRC */
-  ZOPFLI_APPEND_DATA(crcvalue % 256, out, outsize);
-  ZOPFLI_APPEND_DATA((crcvalue >> 8) % 256, out, outsize);
-  ZOPFLI_APPEND_DATA((crcvalue >> 16) % 256, out, outsize);
-  ZOPFLI_APPEND_DATA((crcvalue >> 24) % 256, out, outsize);
+  ZOPFLI_APPEND_DATA((int)(crcvalue % 256), out, outsize);
+  ZOPFLI_APPEND_DATA((int)((crcvalue >> 8) % 256), out, outsize);
+  ZOPFLI_APPEND_DATA((int)((crcvalue >> 16) % 256), out, outsize);
+  ZOPFLI_APPEND_DATA((int)((crcvalue >> 24) % 256), out, outsize);
 
   /* ISIZE */
   ZOPFLI_APPEND_DATA(insize % 256, out, outsize);
@@ -108,10 +108,11 @@ void ZopfliGzipCompress(const ZopfliOptions* options,
   ZOPFLI_APPEND_DATA((insize >> 16) % 256, out, outsize);
   ZOPFLI_APPEND_DATA((insize >> 24) % 256, out, outsize);
 
-  if (options->verbose) {
-    fprintf(stderr,
+  if (options.verbose) {
+    System.err.printf(
             "Original Size: %d, Gzip: %d, Compression: %f%% Removed\n",
-            (int)insize, (int)*outsize,
-            100.0 * (double)(insize - *outsize) / (double)insize);
+            (int)insize, outsize[0],
+            100.0 * (double)(insize - outsize[0]) / (double)insize);
   }
+}
 }

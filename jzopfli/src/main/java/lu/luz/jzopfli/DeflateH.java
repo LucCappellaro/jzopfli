@@ -16,20 +16,20 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+//#ifndef ZOPFLI_DEFLATE_H_
+//#define ZOPFLI_DEFLATE_H_
 
-#ifndef ZOPFLI_DEFLATE_H_
-#define ZOPFLI_DEFLATE_H_
-
-/*
+/**
 Functions to compress according to the DEFLATE specification, using the
 "squeeze" LZ77 compression backend.
 */
 
-#include "zopfli.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#include "zopfli.h"
+abstract class DeflateH{
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
 /*
 Compresses according to the deflate specification and append the compressed
@@ -54,19 +54,19 @@ out: pointer to the dynamic output array to which the result is appended. Must
   be freed after use.
 outsize: pointer to the dynamic output array size.
 */
-void ZopfliDeflate(const ZopfliOptions* options, int btype, int final,
-                   const unsigned char* in, size_t insize,
-                   unsigned char* bp, unsigned char** out, size_t* outsize);
+//void ZopfliDeflate(ZopfliOptions options, int btype, int finaL,
+//                   byte[] in, int insize,
+//                   byte[] bp, OutputStream out, int[] outsize);
 
 /*
 Like ZopfliDeflate, but allows to specify start and end byte with instart and
 inend. Only that part is compressed, but earlier bytes are still used for the
 back window.
 */
-void ZopfliDeflatePart(const ZopfliOptions* options, int btype, int final,
-                       const unsigned char* in, size_t instart, size_t inend,
-                       unsigned char* bp, unsigned char** out,
-                       size_t* outsize);
+//void ZopfliDeflatePart(ZopfliOptions options, int btype, int finaL,
+//                       byte[] in, int instart, int inend,
+//                       byte[] bp, OutputStream out,
+//                       int[] outsize);
 
 /*
 Calculates block size in bits.
@@ -75,12 +75,13 @@ dists: ll77 distances
 lstart: start of block
 lend: end of block (not inclusive)
 */
-double ZopfliCalculateBlockSize(const unsigned short* litlens,
-                                const unsigned short* dists,
-                                size_t lstart, size_t lend, int btype);
+//double ZopfliCalculateBlockSize(short[] litlens,
+//                                short[] dists,
+//                                int lstart, int lend, int btype);
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif
+//#ifdef __cplusplus
+//}  // extern "C"
+//#endif
 
-#endif  /* ZOPFLI_DEFLATE_H_ */
+//#endif  /* ZOPFLI_DEFLATE_H_ */
+}

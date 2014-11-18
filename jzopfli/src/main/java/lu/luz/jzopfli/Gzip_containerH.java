@@ -16,19 +16,19 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+//#ifndef ZOPFLI_GZIP_H_
+//#define ZOPFLI_GZIP_H_
 
-#ifndef ZOPFLI_GZIP_H_
-#define ZOPFLI_GZIP_H_
-
-/*
+/**
 Functions to compress according to the Gzip specification.
 */
 
-#include "zopfli.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+//#include "zopfli.h"
+abstract class Gzip_containerH{
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
 
 /*
 Compresses according to the gzip specification and append the compressed
@@ -39,12 +39,13 @@ out: pointer to the dynamic output array to which the result is appended. Must
   be freed after use.
 outsize: pointer to the dynamic output array size.
 */
-void ZopfliGzipCompress(const ZopfliOptions* options,
-                        const unsigned char* in, size_t insize,
-                        unsigned char** out, size_t* outsize);
+//void ZopfliGzipCompress(ZopfliOptions options,
+//                        byte[] in, int insize,
+//                        OutputStream out, int[] outsize);
 
-#ifdef __cplusplus
-}  // extern "C"
-#endif
+//#ifdef __cplusplus
+//}  // extern "C"
+//#endif
 
-#endif  /* ZOPFLI_GZIP_H_ */
+//#endif  /* ZOPFLI_GZIP_H_ */
+}

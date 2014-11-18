@@ -16,20 +16,20 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+//#include "util.h"
 
-#include "util.h"
+import lu.luz.jzopfli.ZopfliH.*;//#include "zopfli.h"
 
-#include "zopfli.h"
-
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-int ZopfliGetDistExtraBits(int dist) {
-#ifdef __GNUC__
-  if (dist < 5) return 0;
-  return (31 ^ __builtin_clz(dist - 1)) - 1; /* log2(dist - 1) - 1 */
-#else
+//#include <assert.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+class Util extends UtilH{
+public static int ZopfliGetDistExtraBits(int dist) {
+//#ifdef __GNUC__
+//  if (dist < 5) return 0;
+//  return (31 ^ __builtin_clz(dist - 1)) - 1; /* log2(dist - 1) - 1 */
+//#else
   if (dist < 5) return 0;
   else if (dist < 9) return 1;
   else if (dist < 17) return 2;
@@ -44,18 +44,18 @@ int ZopfliGetDistExtraBits(int dist) {
   else if (dist < 8193) return 11;
   else if (dist < 16385) return 12;
   else return 13;
-#endif
+//#endif
 }
 
-int ZopfliGetDistExtraBitsValue(int dist) {
-#ifdef __GNUC__
-  if (dist < 5) {
-    return 0;
-  } else {
-    int l = 31 ^ __builtin_clz(dist - 1); /* log2(dist - 1) */
-    return (dist - (1 + (1 << l))) & ((1 << (l - 1)) - 1);
-  }
-#else
+public static int ZopfliGetDistExtraBitsValue(int dist) {
+//#ifdef __GNUC__
+//  if (dist < 5) {
+//    return 0;
+//  } else {
+//    int l = 31 ^ __builtin_clz(dist - 1); /* log2(dist - 1) */
+//    return (dist - (1 + (1 << l))) & ((1 << (l - 1)) - 1);
+//  }
+//#else
   if (dist < 5) return 0;
   else if (dist < 9) return (dist - 5) & 1;
   else if (dist < 17) return (dist - 9) & 3;
@@ -70,19 +70,19 @@ int ZopfliGetDistExtraBitsValue(int dist) {
   else if (dist < 8193) return (dist - 4097) & 2047;
   else if (dist < 16385) return (dist - 8193) & 4095;
   else return (dist - 16385) & 8191;
-#endif
+//#endif
 }
 
-int ZopfliGetDistSymbol(int dist) {
-#ifdef __GNUC__
-  if (dist < 5) {
-    return dist - 1;
-  } else {
-    int l = (31 ^ __builtin_clz(dist - 1)); /* log2(dist - 1) */
-    int r = ((dist - 1) >> (l - 1)) & 1;
-    return l * 2 + r;
-  }
-#else
+public static int ZopfliGetDistSymbol(int dist) {
+//#ifdef __GNUC__
+//  if (dist < 5) {
+//    return dist - 1;
+//  } else {
+//    int l = (31 ^ __builtin_clz(dist - 1)); /* log2(dist - 1) */
+//    int r = ((dist - 1) >> (l - 1)) & 1;
+//    return l * 2 + r;
+//  }
+//#else
   if (dist < 193) {
     if (dist < 13) {  /* dist 0..13. */
       if (dist < 5) return dist - 1;
@@ -119,11 +119,11 @@ int ZopfliGetDistSymbol(int dist) {
       else return 29;
     }
   }
-#endif
+//#endif
 }
 
-int ZopfliGetLengthExtraBits(int l) {
-  static const int table[259] = {
+public static int ZopfliGetLengthExtraBits(int l) {return ZopfliGetLengthExtraBits[l];}
+private static final int ZopfliGetLengthExtraBits[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1,
     2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -141,11 +141,11 @@ int ZopfliGetLengthExtraBits(int l) {
     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
     5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 0
   };
-  return table[l];
-}
 
-int ZopfliGetLengthExtraBitsValue(int l) {
-  static const int table[259] = {
+
+
+public static int ZopfliGetLengthExtraBitsValue(int l) {return ZopfliGetLengthExtraBitsValue[l];}
+private static final int ZopfliGetLengthExtraBitsValue[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 2, 3, 0,
     1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5,
     6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1, 2, 3, 4, 5, 6,
@@ -159,14 +159,14 @@ int ZopfliGetLengthExtraBitsValue(int l) {
     27, 28, 29, 30, 31, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
     16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 0
   };
-  return table[l];
-}
 
-/*
+
+
+/**
 Returns symbol in range [257-285] (inclusive).
 */
-int ZopfliGetLengthSymbol(int l) {
-  static const int table[259] = {
+public static int ZopfliGetLengthSymbol(int l) {return ZopfliGetLengthSymbol[l];}
+private static final int ZopfliGetLengthSymbol[] = {
     0, 0, 0, 257, 258, 259, 260, 261, 262, 263, 264,
     265, 265, 266, 266, 267, 267, 268, 268,
     269, 269, 269, 269, 270, 270, 270, 270,
@@ -200,14 +200,15 @@ int ZopfliGetLengthSymbol(int l) {
     284, 284, 284, 284, 284, 284, 284, 284,
     284, 284, 284, 284, 284, 284, 284, 285
   };
-  return table[l];
-}
 
-void ZopfliInitOptions(ZopfliOptions* options) {
-  options->verbose = 0;
-  options->verbose_more = 0;
-  options->numiterations = 15;
-  options->blocksplitting = 1;
-  options->blocksplittinglast = 0;
-  options->blocksplittingmax = 15;
+
+
+public static void ZopfliInitOptions(ZopfliOptions options) {
+  options.verbose = false;
+  options.verbose_more = false;
+  options.numiterations = 15;
+  options.blocksplitting = true;
+  options.blocksplittinglast = false;
+  options.blocksplittingmax = 15;
+}
 }

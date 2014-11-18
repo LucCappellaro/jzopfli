@@ -16,8 +16,8 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
-
-/*
+package lu.luz.jzopfli;
+/**
 The squeeze functions do enhanced LZ77 compression by optimal parsing with a
 cost model, rather than greedily choosing the longest length or using a single
 step of lazy matching like regular implementations.
@@ -28,19 +28,19 @@ multiple runs are done with updated cost models to converge to a better
 solution.
 */
 
-#ifndef ZOPFLI_SQUEEZE_H_
-#define ZOPFLI_SQUEEZE_H_
+//#ifndef ZOPFLI_SQUEEZE_H_
+//#define ZOPFLI_SQUEEZE_H_
 
-#include "lz77.h"
-
+//#include "lz77.h"
+abstract class SqueezeH{
 /*
 Calculates lit/len and dist pairs for given data.
 If instart is larger than 0, it uses values before instart as starting
 dictionary.
 */
-void ZopfliLZ77Optimal(ZopfliBlockState *s,
-                       const unsigned char* in, size_t instart, size_t inend,
-                       ZopfliLZ77Store* store);
+//void ZopfliLZ77Optimal(ZopfliBlockState s,
+//                       byte[] in, int instart, int inend,
+//                       ZopfliLZ77Store store);
 
 /*
 Does the same as ZopfliLZ77Optimal, but optimized for the fixed tree of the
@@ -52,9 +52,10 @@ using with a fixed tree.
 If instart is larger than 0, it uses values before instart as starting
 dictionary.
 */
-void ZopfliLZ77OptimalFixed(ZopfliBlockState *s,
-                            const unsigned char* in,
-                            size_t instart, size_t inend,
-                            ZopfliLZ77Store* store);
+//void ZopfliLZ77OptimalFixed(ZopfliBlockState s,
+//                            byte[] in,
+//                            int instart, int inend,
+//                            ZopfliLZ77Store store);
 
-#endif  /* ZOPFLI_SQUEEZE_H_ */
+//#endif  /* ZOPFLI_SQUEEZE_H_ */
+}

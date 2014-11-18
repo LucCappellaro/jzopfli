@@ -16,12 +16,12 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+//#ifndef ZOPFLI_KATAJAINEN_H_
+//#define ZOPFLI_KATAJAINEN_H_
 
-#ifndef ZOPFLI_KATAJAINEN_H_
-#define ZOPFLI_KATAJAINEN_H_
-
-#include <string.h>
-
+//#include <string.h>
+abstract class KatajainenH{
 /*
 Outputs minimum-redundancy length-limited code bitlengths for symbols with the
 given counts. The bitlengths are limited by maxbits.
@@ -36,7 +36,8 @@ maxbits: Maximum bit length, inclusive.
 bitlengths: Output, the bitlengths for the symbol prefix codes.
 return: 0 for OK, non-0 for error.
 */
-int ZopfliLengthLimitedCodeLengths(
-    const size_t* frequencies, int n, int maxbits, unsigned* bitlengths);
+//int ZopfliLengthLimitedCodeLengths(
+//    int[] frequencies, int n, int maxbits, int[] bitlengths);
 
-#endif  /* ZOPFLI_KATAJAINEN_H_ */
+//#endif  /* ZOPFLI_KATAJAINEN_H_ */
+}

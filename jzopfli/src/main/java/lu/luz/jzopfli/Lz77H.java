@@ -16,22 +16,22 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
-
-/*
+package lu.luz.jzopfli;
+/**
 Functions for basic LZ77 compression and utilities for the "squeeze" LZ77
 compression.
 */
 
-#ifndef ZOPFLI_LZ77_H_
-#define ZOPFLI_LZ77_H_
+//#ifndef ZOPFLI_LZ77_H_
+//#define ZOPFLI_LZ77_H_
 
-#include <stdlib.h>
+//#include <stdlib.h>
 
-#include "cache.h"
-#include "hash.h"
-#include "zopfli.h"
-
-/*
+import lu.luz.jzopfli.CacheH.*;//#include "cache.h"
+//#include "hash.h"
+import lu.luz.jzopfli.ZopfliH.*;//#include "zopfli.h"
+abstract class Lz77H{
+/**
 Stores lit/length and dist pairs for LZ77.
 Parameter litlens: Contains the literal symbols or length values.
 Parameter dists: Contains the distances. A value is 0 to indicate that there is
@@ -41,36 +41,36 @@ The memory can best be managed by using ZopfliInitLZ77Store to initialize it,
 ZopfliCleanLZ77Store to destroy it, and ZopfliStoreLitLenDist to append values.
 
 */
-typedef struct ZopfliLZ77Store {
-  unsigned short* litlens;  /* Lit or len. */
-  unsigned short* dists;  /* If 0: indicates literal in corresponding litlens,
+public static class ZopfliLZ77Store {
+  int[][] litlens;  /* Lit or len. */
+  int[][] dists;  /* If 0: indicates literal in corresponding litlens,
       if > 0: length in corresponding litlens, this is the distance. */
-  size_t size;
-} ZopfliLZ77Store;
+  int[] size;
+} //ZopfliLZ77Store;
 
-void ZopfliInitLZ77Store(ZopfliLZ77Store* store);
-void ZopfliCleanLZ77Store(ZopfliLZ77Store* store);
-void ZopfliCopyLZ77Store(const ZopfliLZ77Store* source, ZopfliLZ77Store* dest);
-void ZopfliStoreLitLenDist(unsigned short length, unsigned short dist,
-                           ZopfliLZ77Store* store);
+//void ZopfliInitLZ77Store(ZopfliLZ77Store store);
+//void ZopfliCleanLZ77Store(ZopfliLZ77Store store);
+//void ZopfliCopyLZ77Store(ZopfliLZ77Store source, ZopfliLZ77Store dest);
+//void ZopfliStoreLitLenDist(int length, int dist,
+//                           ZopfliLZ77Store store);
 
-/*
+/**
 Some state information for compressing a block.
 This is currently a bit under-used (with mainly only the longest match cache),
 but is kept for easy future expansion.
 */
-typedef struct ZopfliBlockState {
-  const ZopfliOptions* options;
+public static class ZopfliBlockState {
+  ZopfliOptions options;
 
-#ifdef ZOPFLI_LONGEST_MATCH_CACHE
+//#ifdef ZOPFLI_LONGEST_MATCH_CACHE
   /* Cache for length/distance pairs found so far. */
-  ZopfliLongestMatchCache* lmc;
-#endif
+  ZopfliLongestMatchCache lmc;
+//#endif
 
   /* The start (inclusive) and end (not inclusive) of the current block. */
-  size_t blockstart;
-  size_t blockend;
-} ZopfliBlockState;
+  int blockstart;
+  int blockend;
+} //ZopfliBlockState;
 
 /*
 Finds the longest match (length and corresponding distance) for LZ77
@@ -88,16 +88,16 @@ sublen: output array of 259 elements, or null. Has, for each length, the
     are used, the first 3 are ignored (the shortest length is 3. It is purely
     for convenience that the array is made 3 longer).
 */
-void ZopfliFindLongestMatch(
-    ZopfliBlockState *s, const ZopfliHash* h, const unsigned char* array,
-    size_t pos, size_t size, size_t limit,
-    unsigned short* sublen, unsigned short* distance, unsigned short* length);
+//void ZopfliFindLongestMatch(
+//    ZopfliBlockState s, ZopfliHash h, byte[] array,
+//    int pos, int size, int limit,
+//    int[] sublen, int[] distance, int[] length);
 
 /*
 Verifies if length and dist are indeed valid, only used for assertion.
 */
-void ZopfliVerifyLenDist(const unsigned char* data, size_t datasize, size_t pos,
-                         unsigned short dist, unsigned short length);
+//void ZopfliVerifyLenDist(byte[] data, int datasize, int pos,
+//                         int dist, int length);
 
 /*
 Counts the number of literal, length and distance symbols in the given lz77
@@ -110,10 +110,10 @@ ll_count: count of each lit/len symbol, must have size 288 (see deflate
     standard)
 d_count: count of each dist symbol, must have size 32 (see deflate standard)
 */
-void ZopfliLZ77Counts(const unsigned short* litlens,
-                      const unsigned short* dists,
-                      size_t start, size_t end,
-                      size_t* ll_count, size_t* d_count);
+//void ZopfliLZ77Counts(int[] litlens,
+//                      int[] dists,
+//                      int start, int end,
+//                      int[] ll_count, int[] d_count);
 
 /*
 Does LZ77 using an algorithm similar to gzip, with lazy matching, rather than
@@ -122,8 +122,9 @@ The result is placed in the ZopfliLZ77Store.
 If instart is larger than 0, it uses values before instart as starting
 dictionary.
 */
-void ZopfliLZ77Greedy(ZopfliBlockState* s, const unsigned char* in,
-                      size_t instart, size_t inend,
-                      ZopfliLZ77Store* store);
+//void ZopfliLZ77Greedy(ZopfliBlockState s, byte[] in,
+//                      int instart, int inend,
+//                      ZopfliLZ77Store store);
 
-#endif  /* ZOPFLI_LZ77_H_ */
+//#endif  /* ZOPFLI_LZ77_H_ */
+}

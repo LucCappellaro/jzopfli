@@ -16,23 +16,23 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+//#include "tree.h"
 
-#include "tree.h"
+//#include <assert.h>
+import static java.lang.Math.log;//#include <math.h>
+//#include <stdio.h>
+//#include <stdlib.h>
 
-#include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "katajainen.h"
-#include "util.h"
-
-void ZopfliLengthsToSymbols(const unsigned* lengths, size_t n, unsigned maxbits,
-                            unsigned* symbols) {
-  size_t* bl_count = (size_t*)malloc(sizeof(size_t) * (maxbits + 1));
-  size_t* next_code = (size_t*)malloc(sizeof(size_t) * (maxbits + 1));
-  unsigned bits, i;
-  unsigned code;
+import static lu.luz.jzopfli.Katajainen.*;//#include "katajainen.h"
+//#include "util.h"
+class Tree extends TreeH{
+public static void ZopfliLengthsToSymbols(int[] lengths, int n, int maxbits,
+                            int[] symbols) {
+  int[] bl_count = new int[maxbits + 1];
+  int[] next_code = new int[maxbits + 1];
+  int bits, i;
+  int code;
 
   for (i = 0; i < n; i++) {
     symbols[i] = 0;
@@ -57,21 +57,21 @@ void ZopfliLengthsToSymbols(const unsigned* lengths, size_t n, unsigned maxbits,
   /* 3) Assign numerical values to all codes, using consecutive values for all
   codes of the same length with the base values determined at step 2. */
   for (i = 0;  i < n; i++) {
-    unsigned len = lengths[i];
+    int len = lengths[i];
     if (len != 0) {
       symbols[i] = next_code[len];
       next_code[len]++;
     }
   }
 
-  free(bl_count);
-  free(next_code);
+  bl_count=null;
+  next_code=null;
 }
 
-void ZopfliCalculateEntropy(const size_t* count, size_t n, double* bitlengths) {
-  static const double kInvLog2 = 1.4426950408889;  /* 1.0 / log(2.0) */
-  unsigned sum = 0;
-  unsigned i;
+public static void ZopfliCalculateEntropy(int[] count, int n, double[] bitlengths) {
+  final double kInvLog2 = 1.4426950408889;  /* 1.0 / log(2.0) */
+  int sum = 0;
+  int i;
   double log2sum;
   for (i = 0; i < n; ++i) {
     sum += count[i];
@@ -93,9 +93,10 @@ void ZopfliCalculateEntropy(const size_t* count, size_t n, double* bitlengths) {
   }
 }
 
-void ZopfliCalculateBitLengths(const size_t* count, size_t n, int maxbits,
-                               unsigned* bitlengths) {
-  int error = ZopfliLengthLimitedCodeLengths(count, n, maxbits, bitlengths);
-  (void) error;
+public static void ZopfliCalculateBitLengths(int[] count, int n, int maxbits,
+                               int[] bitlengths) {
+  boolean error = ZopfliLengthLimitedCodeLengths(count, n, maxbits, bitlengths);
+  //(void) error;
   assert(!error);
+}
 }

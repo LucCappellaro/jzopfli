@@ -16,7 +16,7 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
-
+package lu.luz.jzopfli;
 /*
 Zopfli compressor program. It can output gzip-, zlib- or deflate-compatible
 data. By default it creates a .gz file. This tool can only compress, not
@@ -24,160 +24,160 @@ decompress. Decompression can be done by any standard gzip, zlib or deflate
 decompressor.
 */
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <assert.h>
+import java.nio.file.*;import java.io.*;//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 
-#include "deflate.h"
-#include "gzip_container.h"
-#include "zlib_container.h"
-
+import static lu.luz.jzopfli.ZopfliH.ZopfliFormat.*;//#include "deflate.h"
+import static lu.luz.jzopfli.Util.*;//#include "gzip_container.h"
+import static lu.luz.jzopfli.Zopfli_lib.*;//#include "zlib_container.h"
+public class Zopfli_bin{
 /*
 Loads a file into a memory array.
 */
-static void LoadFile(const char* filename,
-                     unsigned char** out, size_t* outsize) {
-  FILE* file;
+private static void LoadFile(String filename,
+                     byte[][] out, int[] outsize) throws IOException {
+  File file;
 
-  *out = 0;
-  *outsize = 0;
-  file = fopen(filename, "rb");
-  if (!file) return;
+  out[0] = null;
+  outsize[0] = 0;
+  file = new File(filename);
 
-  fseek(file , 0 , SEEK_END);
-  *outsize = ftell(file);
-  rewind(file);
 
-  *out = (unsigned char*)malloc(*outsize);
+  //fseek(file , 0 , SEEK_END);
+  outsize[0] = (int)file.length();
+  //rewind(file);
 
-  if (*outsize && (*out)) {
-    size_t testsize = fread(*out, 1, *outsize, file);
-    if (testsize != *outsize) {
+  out[0] = new byte[outsize[0]];
+
+  if (outsize[0]!=0 && out[0]!=null) {
+    int testsize = (out[0]=Files.readAllBytes(file.toPath())).length;
+    if (testsize != outsize[0]) {
       /* It could be a directory */
-      free(*out);
-      *out = 0;
-      *outsize = 0;
+      out[0]=null;
+      out = null;
+      outsize[0] = 0;
     }
   }
 
-  assert(!(*outsize) || out);  /* If size is not zero, out must be allocated. */
-  fclose(file);
+  assert(!(outsize[0]!=0) || out!=null);  /* If size is not zero, out must be allocated. */
+  file=null;
 }
 
-/*
+/**
 Saves a file from a memory array, overwriting the file if it existed.
 */
-static void SaveFile(const char* filename,
-                     const unsigned char* in, size_t insize) {
-  FILE* file = fopen(filename, "wb" );
-  assert(file);
-  fwrite((char*)in, 1, insize, file);
-  fclose(file);
+private static void SaveFile(String filename,
+                     byte[][] in, int[] insize) throws IOException {
+  FileOutputStream file = new FileOutputStream(filename);
+  assert(file!=null);
+  file.write(in[0], 0, insize[0]);
+  file.close();
 }
 
-/*
+/**
 outfilename: filename to write output to, or 0 to write to stdout instead
 */
-static void CompressFile(const ZopfliOptions* options,
+private static void CompressFile(ZopfliOptions options,
                          ZopfliFormat output_type,
-                         const char* infilename,
-                         const char* outfilename) {
-  unsigned char* in;
-  size_t insize;
-  unsigned char* out = 0;
-  size_t outsize = 0;
-  LoadFile(infilename, &in, &insize);
-  if (insize == 0) {
-    fprintf(stderr, "Invalid filename: %s\n", infilename);
+                         String infilename,
+                         String outfilename) throws IOException {
+  byte[][] in={{0}};
+  int[] insize={0};
+  byte[][] out = {{0}};
+  int[] outsize = {0};
+  LoadFile(infilename, in, insize);
+  if (insize[0] == 0) {
+	  System.err.printf("Invalid filename: %s\n", infilename);
     return;
   }
 
-  ZopfliCompress(options, output_type, in, insize, &out, &outsize);
+  ZopfliCompress(options, output_type, in[0], insize[0], out, outsize);
 
-  if (outfilename) {
+  if (outfilename!=null) {
     SaveFile(outfilename, out, outsize);
   } else {
-    size_t i;
-    for (i = 0; i < outsize; i++) {
+    int i;
+    for (i = 0; i < outsize[0]; i++) {
       /* Works only if terminal does not convert newlines. */
-      printf("%c", out[i]);
+      System.out.write(out[0][i]);
     }
   }
 
-  free(out);
-  free(in);
+  out=null;
+  in=null;
 }
 
-/*
+/**
 Add two strings together. Size does not matter. Result must be freed.
 */
-static char* AddStrings(const char* str1, const char* str2) {
-  size_t len = strlen(str1) + strlen(str2);
-  char* result = (char*)malloc(len + 1);
-  if (!result) exit(-1); /* Allocation failed. */
-  strcpy(result, str1);
-  strcat(result, str2);
-  return result;
+private static String AddStrings(String str1, String str2) {
+  int len = str1.length() + str2.length();
+  StringBuilder result = new StringBuilder(len + 1);
+
+  result.append(str1);
+  result.append(str2);
+  return result.toString();
 }
 
-static char StringsEqual(const char* str1, const char* str2) {
-  return strcmp(str1, str2) == 0;
+private static boolean StringsEqual(String str1, String str2) {
+  return str1.equals(str2);
 }
 
-int main(int argc, char* argv[]) {
-  ZopfliOptions options;
+public static void main(String argv[]) throws Exception {
+  ZopfliOptions options=new ZopfliOptions();
   ZopfliFormat output_type = ZOPFLI_FORMAT_GZIP;
-  const char* filename = 0;
-  int output_to_stdout = 0;
+  String filename = null;
+  boolean output_to_stdout = false;
   int i;
 
-  ZopfliInitOptions(&options);
+  ZopfliInitOptions(options);
 
-  for (i = 1; i < argc; i++) {
-    const char* arg = argv[i];
-    if (StringsEqual(arg, "-v")) options.verbose = 1;
-    else if (StringsEqual(arg, "-c")) output_to_stdout = 1;
+  for (i = 0; i < argv.length; i++) {
+    String arg = argv[i];
+    if (StringsEqual(arg, "-v")) options.verbose = true;
+    else if (StringsEqual(arg, "-c")) output_to_stdout = true;
     else if (StringsEqual(arg, "--deflate")) {
       output_type = ZOPFLI_FORMAT_DEFLATE;
     }
     else if (StringsEqual(arg, "--zlib")) output_type = ZOPFLI_FORMAT_ZLIB;
     else if (StringsEqual(arg, "--gzip")) output_type = ZOPFLI_FORMAT_GZIP;
-    else if (StringsEqual(arg, "--splitlast")) options.blocksplittinglast = 1;
-    else if (arg[0] == '-' && arg[1] == '-' && arg[2] == 'i'
-        && arg[3] >= '0' && arg[3] <= '9') {
-      options.numiterations = atoi(arg + 3);
+    else if (StringsEqual(arg, "--splitlast")) options.blocksplittinglast = true;
+    else if (arg.charAt(0)=='-' && arg.charAt(1) == '-' && arg.charAt(2) == 'i'
+        && arg.charAt(3) >= '0' && arg.charAt(3) <= '9') {
+      options.numiterations = Integer.valueOf(arg.substring(3));
     }
     else if (StringsEqual(arg, "-h")) {
-      fprintf(stderr,
-          "Usage: zopfli [OPTION]... FILE\n"
-          "  -h    gives this help\n"
-          "  -c    write the result on standard output, instead of disk"
-          " filename + '.gz'\n"
-          "  -v    verbose mode\n"
-          "  --i#  perform # iterations (default 15). More gives"
-          " more compression but is slower."
+      System.err.printf(
+          "Usage: zopfli [OPTION]... FILE\n"+
+          "  -h    gives this help\n"+
+          "  -c    write the result on standard output, instead of disk"+
+          " filename + '.gz'\n"+
+          "  -v    verbose mode\n"+
+          "  --i#  perform # iterations (default 15). More gives"+
+          " more compression but is slower."+
           " Examples: --i10, --i50, --i1000\n");
-      fprintf(stderr,
-          "  --gzip        output to gzip format (default)\n"
-          "  --zlib        output to zlib format instead of gzip\n"
-          "  --deflate     output to deflate format instead of gzip\n"
+      System.err.printf(
+          "  --gzip        output to gzip format (default)\n"+
+          "  --zlib        output to zlib format instead of gzip\n"+
+          "  --deflate     output to deflate format instead of gzip\n"+
           "  --splitlast   do block splitting last instead of first\n");
-      return 0;
+      return;
     }
   }
 
   if (options.numiterations < 1) {
-    fprintf(stderr, "Error: must have 1 or more iterations");
-    return 0;
+	  System.err.println("Error: must have 1 or more iterations");
+	  return;
   }
 
-  for (i = 1; i < argc; i++) {
-    if (argv[i][0] != '-') {
-      char* outfilename;
+  for (i = 0; i < argv.length; i++) {
+    if (argv[i].charAt(0) != '-') {
+      String outfilename;
       filename = argv[i];
       if (output_to_stdout) {
-        outfilename = 0;
+        outfilename = null;
       } else if (output_type == ZOPFLI_FORMAT_GZIP) {
         outfilename = AddStrings(filename, ".gz");
       } else if (output_type == ZOPFLI_FORMAT_ZLIB) {
@@ -186,18 +186,19 @@ int main(int argc, char* argv[]) {
         assert(output_type == ZOPFLI_FORMAT_DEFLATE);
         outfilename = AddStrings(filename, ".deflate");
       }
-      if (options.verbose && outfilename) {
-        fprintf(stderr, "Saving to: %s\n", outfilename);
+      if (options.verbose && outfilename!=null) {
+    	  System.err.printf("Saving to: %s\n", outfilename);
       }
-      CompressFile(&options, output_type, filename, outfilename);
-      free(outfilename);
+      CompressFile(options, output_type, filename, outfilename);
+      //free(outfilename);
     }
   }
 
-  if (!filename) {
-    fprintf(stderr,
-            "Please provide filename\nFor help, type: %s -h\n", argv[0]);
+  if (filename==null) {
+	  System.err.printf(
+            "Please provide filename\nFor help, type: %s -h\n", "java -jar "+new java.io.File(Zopfli_bin.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName());
   }
 
-  return 0;
+  return;
+}
 }

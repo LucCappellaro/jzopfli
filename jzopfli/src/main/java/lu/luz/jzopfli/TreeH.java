@@ -16,28 +16,28 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
-
-/*
+package lu.luz.jzopfli;
+/**
 Utilities for creating and using Huffman trees.
 */
 
-#ifndef ZOPFLI_TREE_H_
-#define ZOPFLI_TREE_H_
+//#ifndef ZOPFLI_TREE_H_
+//#define ZOPFLI_TREE_H_
 
-#include <string.h>
-
+//#include <string.h>
+abstract class TreeH{
 /*
 Calculates the bitlengths for the Huffman tree, based on the counts of each
 symbol.
 */
-void ZopfliCalculateBitLengths(const size_t* count, size_t n, int maxbits,
-                               unsigned *bitlengths);
+//void ZopfliCalculateBitLengths(int[] count, int n, int maxbits,
+//                               int[] bitlengths);
 
 /*
 Converts a series of Huffman tree bitlengths, to the bit values of the symbols.
 */
-void ZopfliLengthsToSymbols(const unsigned* lengths, size_t n, unsigned maxbits,
-                            unsigned* symbols);
+//void ZopfliLengthsToSymbols(int[] lengths, int n, int maxbits,
+//                            int[] symbols);
 
 /*
 Calculates the entropy of each symbol, based on the counts of each symbol. The
@@ -46,6 +46,7 @@ actual theoritical bit lengths according to the entropy. Since the resulting
 values are fractional, they cannot be used to encode the tree specified by
 DEFLATE.
 */
-void ZopfliCalculateEntropy(const size_t* count, size_t n, double* bitlengths);
+//void ZopfliCalculateEntropy(int[] count, int n, double[] bitlengths);
 
-#endif  /* ZOPFLI_TREE_H_ */
+//#endif  /* ZOPFLI_TREE_H_ */
+}

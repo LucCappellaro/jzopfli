@@ -16,27 +16,28 @@ limitations under the License.
 Author: lode.vandevenne@gmail.com (Lode Vandevenne)
 Author: jyrki.alakuijala@gmail.com (Jyrki Alakuijala)
 */
+package lu.luz.jzopfli;
+import static lu.luz.jzopfli.ZopfliH.ZopfliFormat.*;//#include "zopfli.h"
 
-#include "zopfli.h"
+import static lu.luz.jzopfli.Deflate.*;//#include "deflate.h"
+import static lu.luz.jzopfli.Gzip_container.*;//#include "gzip_container.h"
+import static lu.luz.jzopfli.Zlib_container.*;//#include "zlib_container.h"
 
-#include "deflate.h"
-#include "gzip_container.h"
-#include "zlib_container.h"
-
-#include <assert.h>
-
-void ZopfliCompress(const ZopfliOptions* options, ZopfliFormat output_type,
-                    const unsigned char* in, size_t insize,
-                    unsigned char** out, size_t* outsize) {
+//#include <assert.h>
+public class Zopfli_lib extends ZopfliH{
+public static void ZopfliCompress(final ZopfliOptions options, ZopfliFormat output_type,
+                    final byte[] in, int insize,
+                    byte[][] out, int[] outsize) {
   if (output_type == ZOPFLI_FORMAT_GZIP) {
     ZopfliGzipCompress(options, in, insize, out, outsize);
   } else if (output_type == ZOPFLI_FORMAT_ZLIB) {
     ZopfliZlibCompress(options, in, insize, out, outsize);
   } else if (output_type == ZOPFLI_FORMAT_DEFLATE) {
-    unsigned char bp = 0;
-    ZopfliDeflate(options, 2 /* Dynamic block */, 1,
-                  in, insize, &bp, out, outsize);
+    byte[] bp = {0};
+    ZopfliDeflate(options, 2 /* Dynamic block */, true,
+                  in, insize, bp, out, outsize);
   } else {
-    assert(0);
+    assert(false);
   }
+}
 }
