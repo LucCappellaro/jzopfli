@@ -1,10 +1,6 @@
 package lu.luz.jzopfli;
 
 import static lu.luz.jzopfli.Cache.ZopfliInitCache;
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
 import lu.luz.jzopfli.CacheH.ZopfliLongestMatchCache;
 
 import org.junit.Test;
@@ -16,8 +12,8 @@ public class CacheTest {
 		ZopfliLongestMatchCache lmc=new ZopfliLongestMatchCache();
 		ZopfliInitCache(1, lmc);
 		int pos=0;
-		int length=0;
-		int[] sublen={};
+		char length=0;
+		char[] sublen={};
 		Cache.ZopfliCacheToSublen(lmc, pos, length, sublen);
 	}
 	
@@ -45,9 +41,9 @@ public class CacheTest {
 	
 	@Test
 	public void testZopfliSublenToCache() throws Exception  {
-		int[] sublen={};
+		char[] sublen={};
 		int pos=0;
-		int length=0;
+		char length=0;
 		ZopfliLongestMatchCache lmc=new ZopfliLongestMatchCache();
 		Cache.ZopfliSublenToCache(sublen, pos, length, lmc);
 	}

@@ -41,9 +41,9 @@ The memory can best be managed by using ZopfliInitLZ77Store to initialize it,
 ZopfliCleanLZ77Store to destroy it, and ZopfliStoreLitLenDist to append values.
 
 */
-public static class ZopfliLZ77Store {
-  int[][] litlens;  /* Lit or len. */
-  int[][] dists;  /* If 0: indicates literal in corresponding litlens,
+public static final class ZopfliLZ77Store {
+  char[][] litlens;  /* Lit or len. */
+  char[][] dists;  /* If 0: indicates literal in corresponding litlens,
       if > 0: length in corresponding litlens, this is the distance. */
   int[] size;
 } //ZopfliLZ77Store;
@@ -59,7 +59,7 @@ Some state information for compressing a block.
 This is currently a bit under-used (with mainly only the longest match cache),
 but is kept for easy future expansion.
 */
-public static class ZopfliBlockState {
+public static final class ZopfliBlockState {
   ZopfliOptions options;
 
 //#ifdef ZOPFLI_LONGEST_MATCH_CACHE

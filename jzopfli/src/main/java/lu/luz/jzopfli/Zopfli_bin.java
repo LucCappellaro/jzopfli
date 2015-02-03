@@ -32,7 +32,7 @@ import java.nio.file.*;import java.io.*;//#include <stdio.h>
 import static lu.luz.jzopfli.ZopfliH.ZopfliFormat.*;//#include "deflate.h"
 import static lu.luz.jzopfli.Util.*;//#include "gzip_container.h"
 import static lu.luz.jzopfli.Zopfli_lib.*;//#include "zlib_container.h"
-public class Zopfli_bin{
+public final class Zopfli_bin{
 /*
 Loads a file into a memory array.
 */

@@ -26,7 +26,7 @@ The hash for ZopfliFindLongestMatch of lz77.c.
 
 //#include "util.h"
 abstract class HashH{
-public static class ZopfliHash {
+public static final class ZopfliHash {
   int[] head;  /* Hash value to index of its most recent occurance. */
   int[] prev;  /* Index to index of prev. occurance of same hash. */
   int[] hashval;  /* Index to hash value at this index. */

@@ -24,7 +24,7 @@ import static lu.luz.jzopfli.Gzip_container.*;//#include "gzip_container.h"
 import static lu.luz.jzopfli.Zlib_container.*;//#include "zlib_container.h"
 
 //#include <assert.h>
-public class Zopfli_lib extends ZopfliH{
+public final class Zopfli_lib extends ZopfliH{
 public static void ZopfliCompress(final ZopfliOptions options, ZopfliFormat output_type,
                     final byte[] in, int insize,
                     byte[][] out, int[] outsize) {

@@ -36,10 +36,10 @@ the same position.
 Uses large amounts of memory, since it has to remember the distance belonging
 to every possible shorter-than-the-best length (the so called "sublen" array).
 */
-public static class ZopfliLongestMatchCache {
-  int[] length;
-  int[] dist;
-  int[] sublen;
+public static final class ZopfliLongestMatchCache {
+  char[] length;
+  char[] dist;
+  char[] sublen;
 } //ZopfliLongestMatchCache;
 
 /* Initializes the ZopfliLongestMatchCache. */

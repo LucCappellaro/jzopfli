@@ -21,13 +21,13 @@ import static lu.luz.jzopfli.Cache.*; import static lu.luz.jzopfli.Hash.*;//#inc
 import static lu.luz.jzopfli.Util.*;//#include "util.h"
 
 //#include <assert.h>
-import java.nio.*;//#include <stdio.h>
+//#include <stdio.h>
 //#include <stdlib.h>
-class Lz77 extends Lz77H{
+final class Lz77 extends Lz77H{
 public static void ZopfliInitLZ77Store(ZopfliLZ77Store store) {
   store.size = new int[]{0};
-  store.litlens = new int[1][0];
-  store.dists = new int[1][0];
+  store.litlens = new char[1][0];
+  store.dists = new char[1][0];
 }
 
 public static void ZopfliCleanLZ77Store(ZopfliLZ77Store store) {
@@ -40,8 +40,8 @@ public static void ZopfliCopyLZ77Store(
   int i;
   ZopfliCleanLZ77Store(dest);
   dest.litlens =
-      new int[1][source.size[0]];
-  dest.dists = new int[1][source.size[0]];
+      new char[1][source.size[0]];
+  dest.dists = new char[1][source.size[0]];
 
 
 
@@ -56,7 +56,7 @@ public static void ZopfliCopyLZ77Store(
 Appends the length and distance to the LZ77 arrays of the ZopfliLZ77Store.
 context must be a ZopfliLZ77Store*.
 */
-public static void ZopfliStoreLitLenDist(int length, int dist,
+public static void ZopfliStoreLitLenDist(char length, char dist,
                            ZopfliLZ77Store store) {
   int[] size2 = new int[]{store.size[0]};  /* Needed for using ZOPFLI_APPEND_DATA twice. */
   ZOPFLI_APPEND_DATA(length, store.litlens, store.size);
@@ -92,7 +92,7 @@ private static int GetLengthScore(int length, int distance) {
   return distance > 1024 ? length - 1 : length;
 }
 
-public static void ZopfliVerifyLenDist(byte[] data, int datasize, int pos,
+public static boolean ZopfliVerifyLenDist(byte[] data, int datasize, int pos,
                          int dist, int length) {
 
   /* TODO(lode): make this only run in a debug compile, it's for assert only. */
@@ -104,7 +104,7 @@ public static void ZopfliVerifyLenDist(byte[] data, int datasize, int pos,
       assert(data[pos - dist + i] == data[pos + i]);
       break;
     }
-  }
+  } return true;
 }
 
 /**
@@ -120,29 +120,28 @@ private static int GetMatch(byte[] array, int scan,
                                      int match,
                                      int end,
                                      int safe_end) {
-
+//	ByteBuffer array=ByteBuffer.wrap(array1);
 //  if (sizeof(size_t) == 8) {
 //    /* 8 checks at once per array bounds check (size_t is 64-bit). */
-//    while (scan < safe_end && *((size_t*)scan) == *((size_t*)match)) {
+//    while (scan < safe_end && array.getLong(scan) == array.getLong(match)) {
 //      scan += 8;
 //      match += 8;
 //    }
 //  } else if (sizeof(unsigned int) == 4) {
 //    /* 4 checks at once per array bounds check (unsigned int is 32-bit). */
-    while (scan < safe_end
-    		&& ByteBuffer.wrap(array, scan, 4).getInt() == ByteBuffer.wrap(array, match, 4).getInt()) {
-      scan += 4;
-      match += 4;
-    }
+//    while (scan < safe_end
+//    	  && array.getInt(scan) == array.getInt(match)) {
+//      scan += 4;
+//      match += 4;
+//    }
 //  } else {
 //    /* do 8 checks at once per array bounds check. */
-//    while (scan < safe_end && array[scan] == array[++match] && array[++scan] == array[++match]
-//          && array[++scan] == array[++match] && array[++scan] == array[++match]
-//          && array[++scan] == array[++match] && array[++scan] == array[++match]
-//          && array[++scan] == array[++match] && array[++scan] == array[++match]) {
-//      scan++; match++;
-//      ByteBuffer.wrap(array).g
-//    }
+    while (scan < safe_end && array[scan] == array[match] && array[++scan] == array[++match]
+          && array[++scan] == array[++match] && array[++scan] == array[++match]
+          && array[++scan] == array[++match] && array[++scan] == array[++match]
+          && array[++scan] == array[++match] && array[++scan] == array[++match]) {
+      scan++; match++;
+    }
 //  }
 
   /* The remaining few bytes. */
@@ -161,8 +160,8 @@ Updates the limit value to a smaller one if possible with more limited
 information from the cache.
 */
 private static boolean TryGetFromLongestMatchCache(ZopfliBlockState s,
-    int pos, int[] limit,
-    int[] sublen, int[] distance, int[] length) {
+    int pos, char[] limit,
+    char[] sublen, char[] distance, char[] length) {
   /* The LMC cache starts at the beginning of the block rather than the
      beginning of the whole array. */
   int lmcpos = pos - s.blockstart;
@@ -205,9 +204,9 @@ Stores the found sublen, distance and length in the longest match cache, if
 possible.
 */
 private static void StoreInLongestMatchCache(ZopfliBlockState s,
-    int pos, int limit,
-    int[] sublen,
-    int distance, int length) {
+    int pos, char limit,
+    char[] sublen,
+    char distance, char length) {
   /* The LMC cache starts at the beginning of the block rather than the
      beginning of the whole array. */
   int lmcpos = pos - s.blockstart;
@@ -229,11 +228,11 @@ private static void StoreInLongestMatchCache(ZopfliBlockState s,
 
 public static void ZopfliFindLongestMatch(ZopfliBlockState s, ZopfliHash h,
     byte[] array,
-    int pos, int size, int[] limit,
-    int[] sublen, int[] distance, int[] length) {
+    int pos, int size, char[] limit,
+    char[] sublen, char[] distance, char[] length) {
   int hpos = pos & ZOPFLI_WINDOW_MASK, p, pp;
-  int bestdist = 0;
-  int bestlength = 1;
+  char bestdist = 0;
+  char bestlength = 1;
   int scan;
   int match;
   int arrayend;
@@ -242,7 +241,7 @@ public static void ZopfliFindLongestMatch(ZopfliBlockState s, ZopfliHash h,
   int chain_counter = ZOPFLI_MAX_CHAIN_HITS;  /* For quitting early. */
 //#endif
 
-  int dist = 0;  /* Not unsigned short on purpose. */
+  char dist = 0;  /* Not unsigned short on purpose. */
 
   int[] hhead = h.head;
   int[] hprev = h.prev;
@@ -269,7 +268,7 @@ public static void ZopfliFindLongestMatch(ZopfliBlockState s, ZopfliHash h,
   }
 
   if (pos + limit[0] > size) {
-    limit[0] = size - pos;
+    limit[0] = (char) (size - pos);
   }
   arrayend = pos + limit[0];
   arrayend_safe = arrayend - 8;
@@ -281,11 +280,11 @@ public static void ZopfliFindLongestMatch(ZopfliBlockState s, ZopfliHash h,
 
   assert(pp == hpos);
 
-  dist = p < pp ? pp - p : ((ZOPFLI_WINDOW_SIZE - p) + pp);
+  dist = (char)(p < pp ? pp - p : ((ZOPFLI_WINDOW_SIZE - p) + pp));
 
   /* Go through all distances. */
   while (dist < ZOPFLI_WINDOW_SIZE) {
-    int currentlength = 0;
+	char currentlength = 0;
 
     assert(p < ZOPFLI_WINDOW_SIZE);
     assert(p == hprev[pp]);
@@ -312,7 +311,7 @@ public static void ZopfliFindLongestMatch(ZopfliBlockState s, ZopfliHash h,
         }
 //#endif
         scan = GetMatch(array, scan, match, arrayend, arrayend_safe);
-        currentlength = scan - pos;  /* The found length. */
+        currentlength = (char)(scan - pos);  /* The found length. */
       }
 
       if (currentlength > bestlength) {
@@ -368,20 +367,20 @@ public static void ZopfliLZ77Greedy(ZopfliBlockState s, byte[] in,
                       int instart, int inend,
                       ZopfliLZ77Store store) {
   int i = 0, j;
-  int[] leng={0};
-  int[] dist={0};
+  char[] leng={0};
+  char[] dist={0};
   int lengthscore;
   int windowstart = instart > ZOPFLI_WINDOW_SIZE
       ? instart - ZOPFLI_WINDOW_SIZE : 0;
-  int[] dummysublen=new int[259];
+  char[] dummysublen=new char[259];
 
   ZopfliHash hash=new ZopfliHash();
   ZopfliHash h = hash;
 
 //#ifdef ZOPFLI_LAZY_MATCHING
   /* Lazy matching. */
-  int prev_length = 0;
-  int prev_match = 0;
+  char prev_length = 0;
+  char prev_match = 0;
   int prevlengthscore;
   boolean match_available = false;
 //#endif
@@ -397,7 +396,7 @@ public static void ZopfliLZ77Greedy(ZopfliBlockState s, byte[] in,
   for (i = instart; i < inend; i++) {
     ZopfliUpdateHash(in, i, inend, h);
 
-    ZopfliFindLongestMatch(s, h, in, i, inend, new int[]{ZOPFLI_MAX_MATCH}, dummysublen,
+    ZopfliFindLongestMatch(s, h, in, i, inend, new char[]{ZOPFLI_MAX_MATCH}, dummysublen,
                            dist, leng);
     lengthscore = GetLengthScore(leng[0], dist[0]);
 
@@ -407,7 +406,7 @@ public static void ZopfliLZ77Greedy(ZopfliBlockState s, byte[] in,
     if (match_available) {
       match_available = false;
       if (lengthscore > prevlengthscore + 1) {
-        ZopfliStoreLitLenDist(in[i - 1]&0xFF, 0, store);
+        ZopfliStoreLitLenDist((char)(in[i - 1]&0xFF), (char)0, store);
         if (lengthscore >= ZOPFLI_MIN_MATCH && leng[0] < ZOPFLI_MAX_MATCH) {
           match_available = true;
           prev_length = leng[0];
@@ -420,7 +419,7 @@ public static void ZopfliLZ77Greedy(ZopfliBlockState s, byte[] in,
         dist[0] = prev_match;
         lengthscore = prevlengthscore;
         /* Add to output. */
-        ZopfliVerifyLenDist(in, inend, i - 1, dist[0], leng[0]);
+        assert ZopfliVerifyLenDist(in, inend, i - 1, dist[0], leng[0]);
         ZopfliStoreLitLenDist(leng[0], dist[0], store);
         for (j = 2; j < leng[0]; j++) {
           assert(i < inend);
@@ -441,11 +440,11 @@ public static void ZopfliLZ77Greedy(ZopfliBlockState s, byte[] in,
 
     /* Add to output. */
     if (lengthscore >= ZOPFLI_MIN_MATCH) {
-      ZopfliVerifyLenDist(in, inend, i, dist[0], leng[0]);
+      assert ZopfliVerifyLenDist(in, inend, i, dist[0], leng[0]);
       ZopfliStoreLitLenDist(leng[0], dist[0], store);
     } else {
       leng[0] = 1;
-      ZopfliStoreLitLenDist(in[i]&0xFF, 0, store);
+      ZopfliStoreLitLenDist((char)(in[i]&0xFF), (char)0, store);
     }
     for (j = 1; j < leng[0]; j++) {
       assert(i < inend);
@@ -457,18 +456,18 @@ public static void ZopfliLZ77Greedy(ZopfliBlockState s, byte[] in,
   ZopfliCleanHash(h);
 }
 
-public static void ZopfliLZ77Counts(int[] litlens,
-                      int[] dists,
+public static void ZopfliLZ77Counts(char[] litlens,
+                      char[] dists,
                       int start, int end,
                       int[] ll_count, int[] d_count) {
   int i;
 
-  for (i = 0; i < 288; i++) {
-    ll_count[i] = 0;
-  }
-  for (i = 0; i < 32; i++) {
-    d_count[i] = 0;
-  }
+//  for (i = 0; i < 288; i++) {
+//    ll_count[i] = 0;
+//  }
+//  for (i = 0; i < 32; i++) {
+//    d_count[i] = 0;
+//  }
 
   for (i = start; i < end; i++) {
     if (dists[i] == 0) {

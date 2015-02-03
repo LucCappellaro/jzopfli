@@ -27,7 +27,7 @@ import static lu.luz.jzopfli.BlockSplitter.*;//#include "blocksplitter.h"
 import static lu.luz.jzopfli.Lz77.*;import lu.luz.jzopfli.CacheH.*;import static lu.luz.jzopfli.Cache.*;//#include "lz77.h"
 import static lu.luz.jzopfli.Squeeze.*;//#include "squeeze.h"
 import static lu.luz.jzopfli.Tree.*;//#include "tree.h"
-public class Deflate extends DeflateH{
+public final class Deflate extends DeflateH{
 /**
 bp = bitpointer, always in range [0, 7].
 The outsize is number of necessary bytes to encode the bits.
@@ -37,7 +37,7 @@ whole byte. It is: (bp == 0) ? (bytesize * 8) : ((bytesize - 1) * 8 + bp)
 */
 private static void AddBit(boolean bit,
                    byte[] bp, byte[][] out, int[] outsize) {
-  if (bp[0] == 0) ZOPFLI_APPEND_DATA(0, out, outsize);
+  if (bp[0] == 0) ZOPFLI_APPEND_DATA((byte)0, out, outsize);
   out[0][outsize[0] - 1] |= (bit?1:0) << bp[0];
   bp[0] = (byte)((bp[0] + 1) & 7);
 }
@@ -48,7 +48,7 @@ private static void AddBits(int symbol, int length,
   int i;
   for (i = 0; i < length; i++) {
     int bit = (symbol >> i) & 1;
-    if (bp[0]  == 0) ZOPFLI_APPEND_DATA(0, out, outsize);
+    if (bp[0]  == 0) ZOPFLI_APPEND_DATA((byte)0, out, outsize);
     (out[0])[outsize[0] - 1] |= bit << bp[0];
     bp[0] = (byte)((bp[0] + 1) & 7);
   }
@@ -65,7 +65,7 @@ private static void AddHuffmanBits(int symbol, int length,
   int i;
   for (i = 0; i < length; i++) {
     int bit = (symbol >> (length - i - 1)) & 1;
-    if (bp[0] == 0) ZOPFLI_APPEND_DATA(0, out, outsize);
+    if (bp[0] == 0) ZOPFLI_APPEND_DATA((byte)0, out, outsize);
     (out[0])[outsize[0] - 1] |= bit << bp[0];
     bp[0] = (byte)((bp[0] + 1) & 7);
   }
@@ -128,7 +128,7 @@ private static int EncodeTree(int[] ll_lengths,
   boolean size_only = out==null;
   int result_size = 0;
 
-  for(i = 0; i < 19; i++) clcounts[i] = 0;
+//  for(i = 0; i < 19; i++) clcounts[i] = 0;
 
   /* Trim zeros. */
   while (hlit > 0 && ll_lengths[257 + hlit - 1] == 0) hlit--;
@@ -294,8 +294,8 @@ Adds all lit/len and dist codes from the lists as huffman symbols. Does not add
 end code 256. expected_data_size is the uncompressed block size, used for
 assert, but you can set it to 0 to not do the assertion.
 */
-private static void AddLZ77Data(int[] litlens,
-                        int[] dists,
+private static void AddLZ77Data(char[] litlens,
+                        char[] dists,
                         int lstart, int lend,
                         int expected_data_size,
                         int[] ll_symbols, int[] ll_lengths,
@@ -347,8 +347,8 @@ Calculates size of the part after the header and tree of an LZ77 block, in bits.
 */
 private static int CalculateBlockSymbolSize(int[] ll_lengths,
                                        int[] d_lengths,
-                                       int[] litlens,
-                                       int[] dists,
+                                       char[] litlens,
+                                       char[] dists,
                                        int lstart, int lend) {
   int result = 0;
   int i;
@@ -470,8 +470,8 @@ lengths that give the smallest size of tree encoding + encoding of all the
 symbols to have smallest output size. This are not necessarily the ideal Huffman
 bit lengths.
 */
-static void GetDynamicLengths(int[] litlens,
-                                int[] dists,
+static void GetDynamicLengths(char[] litlens,
+                                char[] dists,
                                 int lstart, int lend, 
                                 int[] ll_lengths, int[] d_lengths) {
   int[] ll_counts=new int[288];
@@ -485,8 +485,8 @@ static void GetDynamicLengths(int[] litlens,
   PatchDistanceCodesForBuggyDecoders(d_lengths);
 }
 
-public static double ZopfliCalculateBlockSize(int[] litlens,
-                                int[] dists,
+public static double ZopfliCalculateBlockSize(char[] litlens,
+                                char[] dists,
                                 int lstart, int lend, int btype) {
   int[] ll_lengths=new int[288];
   int[] d_lengths=new int[32];
@@ -526,8 +526,8 @@ out: dynamic output array to append to
 outsize: dynamic output array size
 */
 private static void AddLZ77Block(ZopfliOptions options, int btype, boolean finale,
-                         int[] litlens,
-                         int[] dists,
+                         char[] litlens,
+                         char[] dists,
                          int lstart, int lend,
                          int expected_data_size,
                          byte[] bp,
@@ -687,10 +687,10 @@ private static void DeflateNonCompressedBlock(ZopfliOptions options, boolean fin
   /* Any bits of input up to the next byte boundary are ignored. */
   bp[0] = 0;
 
-  ZOPFLI_APPEND_DATA(blocksize % 256, out, outsize);
-  ZOPFLI_APPEND_DATA((blocksize / 256) % 256, out, outsize);
-  ZOPFLI_APPEND_DATA(nlen % 256, out, outsize);
-  ZOPFLI_APPEND_DATA((nlen / 256) % 256, out, outsize);
+  ZOPFLI_APPEND_DATA((byte)blocksize , out, outsize);
+  ZOPFLI_APPEND_DATA((byte)(blocksize / 256), out, outsize);
+  ZOPFLI_APPEND_DATA((byte)nlen, out, outsize);
+  ZOPFLI_APPEND_DATA((byte)(nlen / 256), out, outsize);
 
   for (i = instart; i < inend; i++) {
     ZOPFLI_APPEND_DATA(in[i], out, outsize);

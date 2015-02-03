@@ -26,7 +26,7 @@ import static java.lang.Math.log;//#include <math.h>
 
 import static lu.luz.jzopfli.Katajainen.*;//#include "katajainen.h"
 //#include "util.h"
-class Tree extends TreeH{
+final class Tree extends TreeH{
 public static void ZopfliLengthsToSymbols(int[] lengths, int n, int maxbits,
                             int[] symbols) {
   int[] bl_count = new int[maxbits + 1];
@@ -40,9 +40,9 @@ public static void ZopfliLengthsToSymbols(int[] lengths, int n, int maxbits,
 
   /* 1) Count the number of codes for each code length. Let bl_count[N] be the
   number of codes of length N, N >= 1. */
-  for (bits = 0; bits <= maxbits; bits++) {
-    bl_count[bits] = 0;
-  }
+  //for (bits = 0; bits <= maxbits; bits++) {
+  //  bl_count[bits] = 0;
+  //}
   for (i = 0; i < n; i++) {
     assert(lengths[i] <= maxbits);
     bl_count[lengths[i]]++;
@@ -64,8 +64,8 @@ public static void ZopfliLengthsToSymbols(int[] lengths, int n, int maxbits,
     }
   }
 
-  bl_count=null;
-  next_code=null;
+  //free(bl_count);
+  //free(next_code);
 }
 
 public static void ZopfliCalculateEntropy(int[] count, int n, double[] bitlengths) {

@@ -1,7 +1,5 @@
 package lu.luz.jzopfli;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 
 import lu.luz.jzopfli.ZopfliH.ZopfliOptions;
@@ -25,8 +23,8 @@ public class BlocksplitterTest {
 	@Test
 	public void testZopfliBlockSplitLZ77() throws IOException  {
 		ZopfliOptions options=new ZopfliOptions();
-		int[] litlens={};
-		int[] dists={};
+		char[] litlens={};
+		char[] dists={};
 		int llsize=0;
 		int maxblocks=0;
 		int[][] splitpoints={};

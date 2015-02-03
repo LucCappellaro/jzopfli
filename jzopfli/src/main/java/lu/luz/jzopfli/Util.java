@@ -24,101 +24,101 @@ import lu.luz.jzopfli.ZopfliH.*;//#include "zopfli.h"
 //#include <assert.h>
 //#include <stdio.h>
 //#include <stdlib.h>
-class Util extends UtilH{
+final class Util extends UtilH{
 public static int ZopfliGetDistExtraBits(int dist) {
 //#ifdef __GNUC__
-//  if (dist < 5) return 0;
-//  return (31 ^ __builtin_clz(dist - 1)) - 1; /* log2(dist - 1) - 1 */
-//#else
   if (dist < 5) return 0;
-  else if (dist < 9) return 1;
-  else if (dist < 17) return 2;
-  else if (dist < 33) return 3;
-  else if (dist < 65) return 4;
-  else if (dist < 129) return 5;
-  else if (dist < 257) return 6;
-  else if (dist < 513) return 7;
-  else if (dist < 1025) return 8;
-  else if (dist < 2049) return 9;
-  else if (dist < 4097) return 10;
-  else if (dist < 8193) return 11;
-  else if (dist < 16385) return 12;
-  else return 13;
+  return (31 ^ Integer.numberOfLeadingZeros(dist - 1)) - 1; /* log2(dist - 1) - 1 */
+//#else
+//  if (dist < 5) return 0;
+//  else if (dist < 9) return 1;
+//  else if (dist < 17) return 2;
+//  else if (dist < 33) return 3;
+//  else if (dist < 65) return 4;
+//  else if (dist < 129) return 5;
+//  else if (dist < 257) return 6;
+//  else if (dist < 513) return 7;
+//  else if (dist < 1025) return 8;
+//  else if (dist < 2049) return 9;
+//  else if (dist < 4097) return 10;
+//  else if (dist < 8193) return 11;
+//  else if (dist < 16385) return 12;
+//  else return 13;
 //#endif
 }
 
 public static int ZopfliGetDistExtraBitsValue(int dist) {
 //#ifdef __GNUC__
-//  if (dist < 5) {
-//    return 0;
-//  } else {
-//    int l = 31 ^ __builtin_clz(dist - 1); /* log2(dist - 1) */
-//    return (dist - (1 + (1 << l))) & ((1 << (l - 1)) - 1);
-//  }
+  if (dist < 5) {
+    return 0;
+  } else {
+    int l = 31 ^ Integer.numberOfLeadingZeros(dist - 1); /* log2(dist - 1) */
+    return (dist - (1 + (1 << l))) & ((1 << (l - 1)) - 1);
+  }
 //#else
-  if (dist < 5) return 0;
-  else if (dist < 9) return (dist - 5) & 1;
-  else if (dist < 17) return (dist - 9) & 3;
-  else if (dist < 33) return (dist - 17) & 7;
-  else if (dist < 65) return (dist - 33) & 15;
-  else if (dist < 129) return (dist - 65) & 31;
-  else if (dist < 257) return (dist - 129) & 63;
-  else if (dist < 513) return (dist - 257) & 127;
-  else if (dist < 1025) return (dist - 513) & 255;
-  else if (dist < 2049) return (dist - 1025) & 511;
-  else if (dist < 4097) return (dist - 2049) & 1023;
-  else if (dist < 8193) return (dist - 4097) & 2047;
-  else if (dist < 16385) return (dist - 8193) & 4095;
-  else return (dist - 16385) & 8191;
+//  if (dist < 5) return 0;
+//  else if (dist < 9) return (dist - 5) & 1;
+//  else if (dist < 17) return (dist - 9) & 3;
+//  else if (dist < 33) return (dist - 17) & 7;
+//  else if (dist < 65) return (dist - 33) & 15;
+//  else if (dist < 129) return (dist - 65) & 31;
+//  else if (dist < 257) return (dist - 129) & 63;
+//  else if (dist < 513) return (dist - 257) & 127;
+//  else if (dist < 1025) return (dist - 513) & 255;
+//  else if (dist < 2049) return (dist - 1025) & 511;
+//  else if (dist < 4097) return (dist - 2049) & 1023;
+//  else if (dist < 8193) return (dist - 4097) & 2047;
+//  else if (dist < 16385) return (dist - 8193) & 4095;
+//  else return (dist - 16385) & 8191;
 //#endif
 }
 
 public static int ZopfliGetDistSymbol(int dist) {
 //#ifdef __GNUC__
-//  if (dist < 5) {
-//    return dist - 1;
-//  } else {
-//    int l = (31 ^ __builtin_clz(dist - 1)); /* log2(dist - 1) */
-//    int r = ((dist - 1) >> (l - 1)) & 1;
-//    return l * 2 + r;
-//  }
-//#else
-  if (dist < 193) {
-    if (dist < 13) {  /* dist 0..13. */
-      if (dist < 5) return dist - 1;
-      else if (dist < 7) return 4;
-      else if (dist < 9) return 5;
-      else return 6;
-    } else {  /* dist 13..193. */
-      if (dist < 17) return 7;
-      else if (dist < 25) return 8;
-      else if (dist < 33) return 9;
-      else if (dist < 49) return 10;
-      else if (dist < 65) return 11;
-      else if (dist < 97) return 12;
-      else if (dist < 129) return 13;
-      else return 14;
-    }
+  if (dist < 5) {
+    return dist - 1;
   } else {
-    if (dist < 2049) {  /* dist 193..2049. */
-      if (dist < 257) return 15;
-      else if (dist < 385) return 16;
-      else if (dist < 513) return 17;
-      else if (dist < 769) return 18;
-      else if (dist < 1025) return 19;
-      else if (dist < 1537) return 20;
-      else return 21;
-    } else {  /* dist 2049..32768. */
-      if (dist < 3073) return 22;
-      else if (dist < 4097) return 23;
-      else if (dist < 6145) return 24;
-      else if (dist < 8193) return 25;
-      else if (dist < 12289) return 26;
-      else if (dist < 16385) return 27;
-      else if (dist < 24577) return 28;
-      else return 29;
-    }
+    int l = (31 ^ Integer.numberOfLeadingZeros(dist - 1)); /* log2(dist - 1) */
+    int r = ((dist - 1) >> (l - 1)) & 1;
+    return l * 2 + r;
   }
+//#else
+//  if (dist < 193) {
+//    if (dist < 13) {  /* dist 0..13. */
+//      if (dist < 5) return dist - 1;
+//      else if (dist < 7) return 4;
+//      else if (dist < 9) return 5;
+//      else return 6;
+//    } else {  /* dist 13..193. */
+//      if (dist < 17) return 7;
+//      else if (dist < 25) return 8;
+//      else if (dist < 33) return 9;
+//      else if (dist < 49) return 10;
+//      else if (dist < 65) return 11;
+//      else if (dist < 97) return 12;
+//      else if (dist < 129) return 13;
+//      else return 14;
+//    }
+//  } else {
+//    if (dist < 2049) {  /* dist 193..2049. */
+//      if (dist < 257) return 15;
+//      else if (dist < 385) return 16;
+//      else if (dist < 513) return 17;
+//      else if (dist < 769) return 18;
+//      else if (dist < 1025) return 19;
+//      else if (dist < 1537) return 20;
+//      else return 21;
+//    } else {  /* dist 2049..32768. */
+//      if (dist < 3073) return 22;
+//      else if (dist < 4097) return 23;
+//      else if (dist < 6145) return 24;
+//      else if (dist < 8193) return 25;
+//      else if (dist < 12289) return 26;
+//      else if (dist < 16385) return 27;
+//      else if (dist < 24577) return 28;
+//      else return 29;
+//    }
+//  }
 //#endif
 }
 

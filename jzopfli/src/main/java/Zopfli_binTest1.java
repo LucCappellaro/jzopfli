@@ -1,5 +1,6 @@
 package lu.luz.jzopfli;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class Zopfli_binTest {

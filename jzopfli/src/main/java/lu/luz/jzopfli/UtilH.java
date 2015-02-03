@@ -37,7 +37,7 @@ The window size for deflate. Must be a power of two. This should be 32768, the
 maximum possible by the deflate spec. Anything less hurts compression more than
 speed.
 */
-public static final int ZOPFLI_WINDOW_SIZE=32768;
+public static final char ZOPFLI_WINDOW_SIZE=32768;
 
 /**
 The window mask used to wrap indices into the window. This is why the
@@ -149,7 +149,7 @@ Precondition: allocated size of data is at least a power of two greater than or
 equal than *size.
 */
 //#ifdef __cplusplus /* C++ cannot assign void* from malloc to *data */
-public static void ZOPFLI_APPEND_DATA(int value, byte[][] data, int[] size) {
+public static void ZOPFLI_APPEND_DATA(byte value, byte[][] data, int[] size) {
   if (((size[0]) & ((size[0]) - 1))==0) {
     /*double alloc size if it's a power of two*/
 	byte[][] data_void = data;
@@ -170,7 +170,7 @@ public static void ZOPFLI_APPEND_DATA(int value, int[][] data, int[] size) {
   (size[0])++;
 }
 //#endif
-
+public static void ZOPFLI_APPEND_DATA(char value, char[][] data, int[] size) { if ((size[0] & (size[0] - 1))==0) data[0] = size[0] == 0 ? new char[1]: Arrays.copyOf(data[0], size[0]*2); data[0][size[0]++] = value;}
 
 //#endif  /* ZOPFLI_UTIL_H_ */
 }

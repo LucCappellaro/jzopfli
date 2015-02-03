@@ -1,7 +1,6 @@
 package lu.luz.jzopfli;
 
 import static lu.luz.jzopfli.Lz77.ZopfliInitLZ77Store;
-import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
@@ -26,8 +25,8 @@ public class Lz77Test {
 	
 	@Test
 	public void testZopfliStoreLitLenDist() throws IOException  {
-		int length=0;
-		int dist=0;
+		char length=0;
+		char dist=0;
 		ZopfliLZ77Store store=new ZopfliLZ77Store();
 		ZopfliInitLZ77Store(store);
 		Lz77.ZopfliStoreLitLenDist(length, dist, store);

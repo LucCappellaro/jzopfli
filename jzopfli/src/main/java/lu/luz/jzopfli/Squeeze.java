@@ -26,9 +26,9 @@ import java.util.*;//#include <stdio.h>
 //#include "blocksplitter.h"
 import static lu.luz.jzopfli.Deflate.*; //#include "deflate.h"
 import static lu.luz.jzopfli.Tree.*;//#include "tree.h"
-import static lu.luz.jzopfli.Hash.*;import lu.luz.jzopfli.Lz77H.*;import static lu.luz.jzopfli.Lz77.*;import static lu.luz.jzopfli.Util.*;//#include "util.h"
-class Squeeze extends SqueezeH{
-private static class SymbolStats{
+import static lu.luz.jzopfli.Hash.*;import static lu.luz.jzopfli.Lz77.*;import static lu.luz.jzopfli.Util.*;//#include "util.h"
+final class Squeeze extends SqueezeH{
+private static final class SymbolStats{
   /** The literal and length symbols. */
   int[] litlens = new int[288];
   /** The 32 unique dist symbols, not the 32768 possible dists. */
@@ -72,7 +72,7 @@ private static void AddWeighedStatFreqs(SymbolStats stats1, double w1,
   result.litlens[256] = 1;  /* End symbol. */
 }
 
-private static class RanState {
+private static final class RanState {
   int m_w, m_z;
 } //RanState;
 
@@ -111,14 +111,13 @@ private static void ClearStatFreqs(SymbolStats stats) {
 Function that calculates a cost based on a model for the given LZ77 symbol.
 litlen: means literal symbol if dist is 0, length otherwise.
 */
-private static abstract class CostModelFun{abstract double f(int litlen, int dist, Object context);}
+private interface CostModelFun{double f(int litlen, int dist, Object context);}
 
 /**
 Cost model which should exactly match fixed tree.
 type: CostModelFun
 */
-
-private static GetCostFixed GetCostFixed=new GetCostFixed(); private static class GetCostFixed extends CostModelFun{double f(int litlen, int dist, Object unused) {
+private static final CostModelFun GetCostFixed=new CostModelFun(){public double f(int litlen, int dist, Object unused) {
   //(void)unused;
   if (dist == 0) {
     if (litlen <= 143) return 8;
@@ -133,13 +132,13 @@ private static GetCostFixed GetCostFixed=new GetCostFixed(); private static clas
     cost += 5;  /* Every dist symbol has length 5. */
     return cost + dbits + lbits;
   }
-}
-}
+}};
+
 /**
 Cost model based on symbol statistics.
 type: CostModelFun
 */
-private static GetCostStat GetCostStat=new GetCostStat(); private static class GetCostStat extends CostModelFun{double f(int litlen, int dist, Object context) {
+private static final CostModelFun GetCostStat=new CostModelFun(){public double f(int litlen, int dist, Object context) {
   SymbolStats stats = (SymbolStats)context;
   if (dist == 0) {
     return stats.ll_symbols[litlen];
@@ -150,7 +149,8 @@ private static GetCostStat GetCostStat=new GetCostStat(); private static class G
     int dbits = ZopfliGetDistExtraBits(dist);
     return stats.ll_symbols[lsym] + lbits + stats.d_symbols[dsym] + dbits;
   }
-}}
+}};
+
 /**
 Finds the minimum possible cost this cost model can return for valid length and
 distance symbols.
@@ -209,14 +209,14 @@ private static double GetBestLengths(ZopfliBlockState s,
                              byte[] in,
                              int instart, int inend,
                              CostModelFun costmodel, Object costcontext,
-                             int[] length_array) {
+                             char[] length_array) {
   /* Best cost to get here so far. */
   int blocksize = inend - instart;
   float[] costs;
   int i = 0, k;
-  int[] leng={0};
-  int[] dist={0};
-  int[] sublen=new int[259];
+  char[] leng={0};
+  char[] dist={0};
+  char[] sublen=new char[259];
   int windowstart = instart > ZOPFLI_WINDOW_SIZE
       ? instart - ZOPFLI_WINDOW_SIZE : 0;
   ZopfliHash hash=new ZopfliHash();
@@ -238,7 +238,7 @@ private static double GetBestLengths(ZopfliBlockState s,
   for (i = 1; i < blocksize + 1; i++) costs[i] = ZOPFLI_LARGE_FLOAT;
   costs[0] = 0;  /* Because it's the start. */
   length_array[0] = 0;
-
+  char[] ZOPFLI_MAX_MATCH_P = {0};
   for (i = instart; i < inend; i++) {
     int j = i - instart;  /* Index in the costs array and length_array. */
     ZopfliUpdateHash(in, i, inend, h);
@@ -264,8 +264,8 @@ private static double GetBestLengths(ZopfliBlockState s,
       }
     }
 //#endif
-
-    ZopfliFindLongestMatch(s, h, in, i, inend, new int[]{ZOPFLI_MAX_MATCH}, sublen,
+    ZOPFLI_MAX_MATCH_P[0]=ZOPFLI_MAX_MATCH;
+    ZopfliFindLongestMatch(s, h, in, i, inend, ZOPFLI_MAX_MATCH_P, sublen,
                            dist, leng);
 
     /* Literal. */
@@ -290,7 +290,7 @@ private static double GetBestLengths(ZopfliBlockState s,
       if (newCost < costs[j + k]) {
         assert(k <= ZOPFLI_MAX_MATCH);
         costs[j + k] = (float) newCost;
-        length_array[j + k] = k;
+        length_array[j + k] = (char) k;
       }
     }
   }
@@ -310,8 +310,8 @@ length_array. The length_array must contain the optimal length to reach that
 byte. The path will be filled with the lengths to use, so its data size will be
 the amount of lz77 symbols.
 */
-private static void TraceBackwards(int size, int[] length_array,
-                           int[][] path, int[] pathsize) {
+private static void TraceBackwards(int size, char[] length_array,
+                           char[][] path, int[] pathsize) {
   int index = size;
   if (size == 0) return;
   for (;;) {
@@ -325,7 +325,7 @@ private static void TraceBackwards(int size, int[] length_array,
 
   /* Mirror result. */
   for (index = 0; index < pathsize[0] / 2; index++) {
-    int temp = path[0][index];
+    char temp = path[0][index];
     path[0][index] = path[0][pathsize[0] - index - 1];
     path[0][pathsize[0] - index - 1] = temp;
   }
@@ -333,7 +333,7 @@ private static void TraceBackwards(int size, int[] length_array,
 
 private static void FollowPath(ZopfliBlockState s,
                        byte[] in, int instart, int inend,
-                       int[] path, int pathsize,
+                       char[] path, int pathsize,
                        ZopfliLZ77Store store) {
   int i, j, pos = 0;
   int windowstart = instart > ZOPFLI_WINDOW_SIZE
@@ -351,12 +351,12 @@ private static void FollowPath(ZopfliBlockState s,
   for (i = windowstart; i < instart; i++) {
     ZopfliUpdateHash(in, i, inend, h);
   }
-
+  char[] length={0}, dummy_length={0}, dist={0};
   pos = instart;
   for (i = 0; i < pathsize; i++) {
-    int length[] = {path[i]};
-    int[] dummy_length={0};
-    int[] dist={0};
+    length[0] = path[i];
+    dummy_length[0]=0;
+    dist[0]=0;
     assert(pos < inend);
 
     ZopfliUpdateHash(in, pos, inend, h);
@@ -368,12 +368,12 @@ private static void FollowPath(ZopfliBlockState s,
       ZopfliFindLongestMatch(s, h, in, pos, inend, length, null,
                              dist, dummy_length);
       assert(!(dummy_length[0] != length[0] && length[0] > 2 && dummy_length[0] > 2));
-      ZopfliVerifyLenDist(in, inend, pos, dist[0], length[0]);
+      assert ZopfliVerifyLenDist(in, inend, pos, dist[0], length[0]);
       ZopfliStoreLitLenDist(length[0], dist[0], store);
       //total_length_test += length[0];
     } else {
       length[0] = 1;
-      ZopfliStoreLitLenDist(in[pos]&0xFF, 0, store);
+      ZopfliStoreLitLenDist((char)(in[pos]&0xFF), (char)0, store);
       //total_length_test++;
     }
 
@@ -430,8 +430,8 @@ returns the cost that was, according to the costmodel, needed to get to the end.
 */
 private static double LZ77OptimalRun(ZopfliBlockState s,
     byte[] in, int instart, int inend,
-    int[][] path, int[] pathsize,
-    int[] length_array, CostModelFun costmodel,
+    char[][] path, int[] pathsize,
+    char[] length_array, CostModelFun costmodel,
     Object costcontext, ZopfliLZ77Store store) {
   double cost = GetBestLengths(
       s, in, instart, inend, costmodel, costcontext, length_array);
@@ -449,9 +449,9 @@ public static void ZopfliLZ77Optimal(ZopfliBlockState s,
                        ZopfliLZ77Store store) {
   /* Dist to get to here with smallest cost. */
   int blocksize = inend - instart;
-  int[] length_array =
-      new int[blocksize + 1];
-  int[][] path = {{0}};
+  char[] length_array =
+      new char[blocksize + 1];
+  char[][] path = {{0}};
   int[] pathsize = {0};
   ZopfliLZ77Store currentstore=new ZopfliLZ77Store();
   SymbolStats stats=new SymbolStats(), beststats=new SymbolStats(), laststats=new SymbolStats();
@@ -526,9 +526,9 @@ public static void ZopfliLZ77OptimalFixed(ZopfliBlockState s,
 {
   /* Dist to get to here with smallest cost. */
   int blocksize = inend - instart;
-  int[] length_array =
-      new int[blocksize + 1];
-  int[][] path = {{0}};
+  char[] length_array =
+      new char[blocksize + 1];
+  char[][] path = {{0}};
   int[] pathsize = {0};
 
 

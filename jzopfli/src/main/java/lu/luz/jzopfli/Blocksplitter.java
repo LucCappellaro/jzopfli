@@ -28,13 +28,13 @@ import static lu.luz.jzopfli.ZopfliH.*;import static lu.luz.jzopfli.Lz77H.*;impo
 //#include "squeeze.h"
 //#include "tree.h"
 import static lu.luz.jzopfli.UtilH.*;//#include "util.h"
-class BlockSplitter extends BlockSplitterH{
+final class BlockSplitter extends BlockSplitterH{
 /**
 The "f" for the FindMinimum function below.
 i: the current parameter of f(i)
 context: for your implementation
 */
-private static abstract class FindMinimumFun{abstract double f(int i, Object context);}
+private interface FindMinimumFun{double f(int i, Object context);}
 
 /**
 Finds minimum of function f(i) where is is of type size_t, f(i) is of type
@@ -103,16 +103,16 @@ dists: ll77 distances
 lstart: start of block
 lend: end of block (not inclusive)
 */
-private static double EstimateCost(int[] litlens,
-                           int[] dists,
+private static double EstimateCost(char[] litlens,
+                           char[] dists,
                            int lstart, int lend) {
   return ZopfliCalculateBlockSize(litlens, dists, lstart, lend, 2);
 }
 
-private static class SplitCostContext {
-  int[] litlens;
-  int[] dists;
-  int llsize;
+private static final class SplitCostContext {
+  char[] litlens;
+  char[] dists;
+//  int llsize;
   int start;
   int end;
 } //SplitCostContext;
@@ -123,11 +123,11 @@ Gets the cost which is the sum of the cost of the left and the right section
 of the data.
 type: FindMinimumFun
 */
-private static SplitCost SplitCost=new SplitCost(); private static class SplitCost extends FindMinimumFun{double f(int i, Object context) {
+private static final FindMinimumFun SplitCost=new FindMinimumFun(){public double f(int i, Object context) {
   SplitCostContext c = (SplitCostContext)context;
   return EstimateCost(c.litlens, c.dists, c.start, i) +
       EstimateCost(c.litlens, c.dists, i, c.end);
-}}
+}};
 
 private static void AddSorted(int value, int[][] out, int[] outsize) {
   int i;
@@ -147,8 +147,8 @@ private static void AddSorted(int value, int[][] out, int[] outsize) {
 /**
 Prints the block split points as decimal and hex values in the terminal.
 */
-private static void PrintBlockSplitPoints(int[] litlens,
-                                  int[] dists,
+private static void PrintBlockSplitPoints(char[] litlens,
+                                  char[] dists,
                                   int llsize, int[] lz77splitpoints,
                                   int nlz77points) {
   int[][] splitpoints = {{0}};
@@ -216,12 +216,12 @@ private static boolean FindLargestSplittableBlock(
 }
 
 public static void ZopfliBlockSplitLZ77(ZopfliOptions options,
-                          int[] litlens,
-                          int[] dists,
+                          char[] litlens,
+                          char[] dists,
                           int llsize, int maxblocks,
                           int[][] splitpoints, int[] npoints) {
   int[] lstart={0}, lend={0};
-  int i;
+//  int i;
   int llpos = 0;
   int numblocks = 1;
   boolean[] done;
@@ -231,7 +231,7 @@ public static void ZopfliBlockSplitLZ77(ZopfliOptions options,
 
   done = new boolean[llsize];
 
-  for (i = 0; i < llsize; i++) done[i] = false;
+//  for (i = 0; i < llsize; i++) done[i] = false;
 
   lstart[0] = 0;
   lend[0] = llsize;
@@ -244,7 +244,7 @@ public static void ZopfliBlockSplitLZ77(ZopfliOptions options,
 
     c.litlens = litlens;
     c.dists = dists;
-    c.llsize = llsize;
+//    c.llsize = llsize;
     c.start = lstart[0];
     c.end = lend[0];
     assert(lstart[0] < lend[0]);

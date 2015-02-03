@@ -23,7 +23,7 @@ import static lu.luz.jzopfli.Util.*;//#include "util.h"
 //#include <stdio.h>
 
 import static lu.luz.jzopfli.Deflate.*;//#include "deflate.h"
-class Zlib_container extends Zlib_containerH{
+final class Zlib_container extends Zlib_containerH{
 
 /** Calculates the adler32 checksum of the data */
 private static int adler32(byte[] data, int size)
@@ -59,16 +59,16 @@ public static void ZopfliZlibCompress(ZopfliOptions options,
   int fcheck = 31 - cmfflg % 31;
   cmfflg += fcheck;
 
-  ZOPFLI_APPEND_DATA(cmfflg / 256, out, outsize);
-  ZOPFLI_APPEND_DATA(cmfflg % 256, out, outsize);
+  ZOPFLI_APPEND_DATA((byte)(cmfflg / 256), out, outsize);
+  ZOPFLI_APPEND_DATA((byte)cmfflg, out, outsize);
 
   ZopfliDeflate(options, 2 /* dynamic block */, true /* final */,
                 in, insize, bitpointer, out, outsize);
 
-  ZOPFLI_APPEND_DATA((checksum >> 24) % 256, out, outsize);
-  ZOPFLI_APPEND_DATA((checksum >> 16) % 256, out, outsize);
-  ZOPFLI_APPEND_DATA((checksum >> 8) % 256, out, outsize);
-  ZOPFLI_APPEND_DATA(checksum % 256, out, outsize);
+  ZOPFLI_APPEND_DATA((byte)(checksum >> 24), out, outsize);
+  ZOPFLI_APPEND_DATA((byte)(checksum >> 16), out, outsize);
+  ZOPFLI_APPEND_DATA((byte)(checksum >> 8), out, outsize);
+  ZOPFLI_APPEND_DATA((byte)checksum, out, outsize);
 
   if (options.verbose) {
     System.err.printf(

@@ -26,13 +26,13 @@ Jyrki Katajainen, Alistair Moffat, Andrew Turpin".
 //#include "katajainen.h"
 //#include <assert.h>
 import java.util.*;//#include <stdlib.h>
-class Katajainen extends KatajainenH{
+final class Katajainen extends KatajainenH{
 //typedef struct Node Node;
 
 /**
 Nodes forming chains. Also used to represent leaves.
 */
-private static class Node {
+private static final class Node {
   int weight;  /* Total weight (symbol count) of this chain. */
   Node tail;  /* Previous node(s) of this chain, or 0 if none. */
   int count;  /* Leaf symbol index, or number of leaves before this chain. */
@@ -42,7 +42,7 @@ public String toString(){return "Node[w="+weight+",c="+count+",u="+inuse+"]";}};
 /**
 Memory pool for nodes.
 */
-private static class NodePool {
+private static final class NodePool {
   Node[] nodes;  /* The pool. */
   int next;  /* Pointer to a possibly free node in the pool. */
   int size;  /* Size of the memory pool. */
@@ -173,9 +173,9 @@ private static void ExtractBitLengths(Node chain, Node[] leaves, int[] bitlength
 /**
 Comparator for sorting the leaves. Has the function signature for qsort.
 */
-private static LeafComparator leafComparator=new LeafComparator(); private static class LeafComparator implements Comparator<Node>{public int compare(Node a, Node b) {
+private static final Comparator<Node> leafComparator=new Comparator<Node>(){public int compare(Node a, Node b) {
   return ((Node)a).weight - ((Node)b).weight;
-}}
+}};
 
 public static boolean ZopfliLengthLimitedCodeLengths(
     int[] frequencies, int n, int maxbits, int[] bitlengths) {
@@ -228,7 +228,7 @@ public static boolean ZopfliLengthLimitedCodeLengths(
   pool.nodes = new Node[pool.size];
   pool.next = 0;
   for (i = 0; i < pool.size; i++) {pool.nodes[i]=new Node();
-    pool.nodes[i].inuse = false;
+//    pool.nodes[i].inuse = false;
   }
 
   lists = new Node[maxbits][2];

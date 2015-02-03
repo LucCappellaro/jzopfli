@@ -22,9 +22,9 @@ import static lu.luz.jzopfli.UtilH.*;//#include "hash.h"
 //#include <assert.h>
 //#include <stdio.h>
 //#include <stdlib.h>
-class Hash extends HashH{
-private static int HASH_SHIFT=5;
-private static int HASH_MASK=32767;
+final class Hash extends HashH{
+private static final int HASH_SHIFT=5;
+private static final int HASH_MASK=32767;
 
 public static void ZopfliInitHash(int window_size, ZopfliHash h) {
   int i;
