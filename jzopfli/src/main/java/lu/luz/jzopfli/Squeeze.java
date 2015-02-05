@@ -40,11 +40,11 @@ private static final class SymbolStats{
 
 /** Sets everything to 0. */
 private static void InitStats(SymbolStats stats) {
-  Arrays.fill(stats.litlens, 0);
-  Arrays.fill(stats.dists, 0);
+//  Arrays.fill(stats.litlens, 0);
+//  Arrays.fill(stats.dists, 0);
 
-  Arrays.fill(stats.ll_symbols, 0);
-  Arrays.fill(stats.d_symbols, 0);
+//  Arrays.fill(stats.ll_symbols, 0);
+//  Arrays.fill(stats.d_symbols, 0);
 }
 
 private static void CopyStats(SymbolStats source, SymbolStats dest) {
