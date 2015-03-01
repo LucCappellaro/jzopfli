@@ -4,7 +4,7 @@
 
 	<groupId>com.github.luccappellaro</groupId>
 	<artifactId>jzopfli</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 	<packaging>jar</packaging>
 
 	<name>jzopfli</name>
@@ -65,6 +65,18 @@
 						</manifest>
 					</archive>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.luccappellaro</groupId>
+				<artifactId>jzopfli-mvn</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>jzopfli</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
